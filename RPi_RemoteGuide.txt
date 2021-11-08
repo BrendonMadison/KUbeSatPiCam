@@ -1,0 +1,147 @@
+Remote access guide for the RPi4B using putty and x11 forwarding. 
+
+Confirmed works on windows and should work on any machine that can use ssh and x forwarding.
+
+Written by Brendon Madison on 8th-11th October 2021.
+
+As of writing the Payloads RPi4 has a password of: ##YOURPASSWORDHERE##
+
+
+-----
+
+
+Requirements:
+
+1.) Raspberry Pi 4 (its the thing your connecting to)
+
+2.) Wifi connection or ethernet cable
+
+3.) Raspbian OS installed on RPi
+
+
+-----
+
+
+Steps to run RPi display remotely:
+
+1.) On the RPi go to the start menu (top left) and go to Preferences->Raspberry Pi Confirguration
+
+2.) Note your "Hostname". It is "raspberrypi" by default.
+
+3.) Go to the "Interfaces" tab.
+
+4.) Enable SSH and VNC. If you plan to use a camera then enable Camera too.
+
+5.) Connect the RPi to an internet connection. Check in the top right corner of the desktop.
+
+6.) Open a terminal (black box with >_ symbol).
+
+7.) Type "sudo apt-get install lxde" . This will check and make sure x forwarding via lxde is installed. It may ask for the root user (admin) password. Use the one given above.
+
+8.) After you change the settings reboot the RPi to ensure all the changes have been made.
+
+9.) On your main PC/Laptop install Putty (https://www.putty.org/) if you are using windows.
+
+10.) If you are not using windows make sure you can use -Y and/or -X with ssh . This makes sure you have x forwarding with ssh.
+
+11.) For windows install a local X server software. The best known freeware is vcxsrv (https://sourceforge.net/projects/vcxsrv/). Install this software. It emulates x forwarding on windows.
+
+12.) After ssh and x forwarding are possible the steps here now diverge. 13W.) will refer to the thirteenth step if you have windows. 13L.) will refer to thirteenth step if you use MacOS or Linux.
+
+13W.) Open PuTTY and open vcxsrv. In PuTTY under the "Host Name" type "pi@raspberrypi.local" (no quotes). If the hostname of your RPi is different then it will be "pi@yourhostnamehere.local" (no quotes). Go to "Category" column and go down to "SSH" and then X11. Click "Enable X11 forwarding". You may need to write "localhost:0.0" into the X display location bar but this is not always necessary.
+
+13L.) Open a terminal and type "ssh pi@raspberrypi.local -X" or "ssh pi@raspberrypi.local -Y". If your RPi's hostname is not default then it will be "ssh pi@yourhostnamehere.local -X" and similar for -Y.
+
+14W.) Go back to the main menu "Session". Go down to Saved Sessions and type "RPi" and then save. Then click "Open" at the bottom and enter the password when it asks.
+
+14L.) It should attempt to connect to the RPi and ask you for the password. Type the password above.
+
+15W.) Once ssh connects type "startlxde" (no quotes) into the ssh terminal. Your vcxsrv window should turn into the RPi desktop. It may take a while so be patient. If it doesn't work then make sure PuTTY's settings are correct and vcxsrv was open before ssh terminal connected.
+
+15L.) Once ssh connects type "startlxde" (no quotes) into the ssh terminal. A X forwarded window should open and show the RPi desktop. Be patient. If it doesn't then try again and check that ssh and x forwarding work.
+
+16.) For both, if one types "echo $DISPLAY" (no quotes) it should display "localhost:10" if you are the first display to connect. If you are the second then "localhost:11" and so on.
+
+17.) You should now be able to use the RPi as it normally is with its own standalone display. There will be a delay as all input and display information has to go through the wifi.
+
+
+-----
+
+
+Steps to remotely take files from RPi or put files on RPi:
+
+0.) As in the previous this will require PuTTY for windows and ssh/sftp for Linux and MacOS
+
+1.) All OS will use what is called "secure file transfer protocol" (SFTP). In the case of windows you will use PuTTY's version of this called "PuTTY secure file transfer protocol" (PSFTP).
+
+2.) In windows open a command console (terminal) and type "psftp pi@raspberrypi.local" or "psftp pi@yourhostnamehere.local" if your hostname is not default. In linux/MacOS open a terminal and type "sftp pi@raspberrypi.local" or "sftp pi@yourhostnamehere.local".
+
+3.) Enter the password as provided above or as you have chosen previously.
+
+4.) You should now be logged into the RPi remotely using SFTP. This doesn't have the same access and abilities as ssh or the remote display but you can instead take or put files on the RPi.
+
+5.) To take a file type "get yourfilenamehere". It will look at the current directory on the RPi and look for "yourfilenamehere" and then put it on your PC/Laptop where your terminal is. So, if you opened SFTP when you were in your Documents folder then all the files will be put in your Documents folder.
+
+6.) To put a file that is on your PC/Laptop onto the RPi type "put Your/File/Name/And/Directory/Here". SFTP will look on your PC/Laptop at the directory and file you gave and then put it into the current directory that is on the RPi.
+
+7.) To log off sftp or ssh you can type "exit".
+
+
+-----
+
+
+Alternate method for windows , bitvise:
+
+0.) This uses bitvise, which is an ssh and sftp client/program for Windows. Install bitvise from https://www.bitvise.com/
+
+1.) After bitvise is installed go to the "Login" tab.
+
+2.) Under Server box type out your RPi's Hostname (default is raspberrypi) and also the port (default is 22).
+
+3.) To the right under Authentication, type the username (default is pi) and set the Initial Method to "password".
+
+4.) Click the box to enable "Store encrypted password in profile" and then type the RPi's password into the dialog box.
+
+5.) On the bottom left click the "Log in" button. Bitvise will now log in to the RPi.
+ 
+6.) If it succeeds you should get three new buttons on the left hand column. If you wish to open a terminal on the RPi then click "New terminal window". If you want to transfer files using SFTP then click the "New SFTP window". If you wish to setup a VNC remote desktop then click "New Remote Desktop". 
+
+
+-----
+
+
+Setting up mobile hotspot network for RPi:
+
+0.) Firstly, this may be obvious, but to connect a PC/Laptop to the RPi they must share a network. This can be done by connecting them locally/LAN, with an ethernet cable, or through a WiFi. Since one cannot use the desktop of RPi remotely it is not possible (likely not easy) to change the network of the RPi remotely as the desktop is where one can change the network manually. Instead one can:
+
+	a.) Use a WiFi network that the RPi is already setup with and your PC/Laptop can also access.
+	b.) Create a mobile hotspot on a phone and have both the PC/Laptop and the RPi connect to it. The phone is thusly the common network for both devices.
+	c.) If possible, use the PC/Laptop mobile hotspot setting. This is available in most Dell laptops that come with WiFi.
+
+1.) Since 0.a.) and 0.b.) are fairly personal and straightforward there is no guide for those here. Instead we focus on 0.c.) as the path.
+
+2.) On Windows 10 the "Network & Internet settings" panel is accessible by the drop down menu that is available on the taskbar next to the clock. At the bottom there should be three buttons, "Wi-Fi" , "Airplane mode" and, "Mobile hotspot".
+
+3.) Click on "Mobile hotspot". Then right click it and go to "Go to Settings". There you can turn on and off the mobile hotspot, monitor the devices that are connected and change the network password.
+
+4.) Once mobile hotspot is enabled go to the RPi, while it is in desktop mode, and manually change its WiFi connection to the PC/Laptop mobile hotspot. You will likely have to enter a password that should be on the PC/Laptop mobile hotspot settings page.
+
+5.) With 4.) done the RPi should attempt to connect to this hotspot everytime it boots up. Therefore, as long as the hotspot is on when the RPi boots, it should connect and the PC/Laptop will have a common network. Using this the RPi is still connected to the internet too, but it is through the PC/Laptop. This also requires that the PC/Laptop have its own connection to the internet. It is possible to do so without internet connection but it requires additional software/apps that are available to Windows 10 but outside the scope of this guide.
+
+
+-----
+
+
+Changing the RPi bootscript and rebooting:
+
+0.) Often times it is desirable to connect to the RPi, change some settings and then reboot it. Such as if you wanted to have it autonomously run a script. This is desirable if you don't want to have to keep a connection (i.e. ssh terminal) dedicated to the RPi.
+
+1.) (Optional) Setup your mobile hotspot on your PC/Laptop/Phone and connect the PC/Laptop to it and then reboot the RPi such that it connects to the hotspot. For the RPi to connect it must already be set to connect to it by default (guide for that above).
+
+2.) Using some kind of ssh software ssh into the RPi. Then type "sudo crontab -e". This brings up the bootscript (crontab). Anything you put in the bootscript will execute everytime the RPi is rebooted or powered on successfully.
+
+3.) For example, if I wanted to run the script "RpiCameraMockCode.py" inside the folder "PetriDishTests" then I would put "python3 PetriDishTests/RpiCameraMockCode.py" into the crontab.
+
+4.) If you want a log that keeps track of the terminal output of this bootscript then add the following to the script -- "python3 PetriDishTests/RpiCameraMockCode.py &>> log.txt". This will create and append to a file "log.txt" with all the terminal output.
+
+5.) When you want to reboot use "sudo reboot now" or "sudo reboot -r 10" for reboot in 10 seconds. To shutdown "sudo shutdown now".
